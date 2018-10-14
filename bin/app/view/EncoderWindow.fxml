@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="322.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="app.view.EncoderController">
+   <children>
+      <GridPane layoutX="40.0" layoutY="7.0" prefHeight="262.0" prefWidth="410.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="50.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="92.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="308.0" minWidth="10.0" prefWidth="308.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="51.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="80.0" minHeight="0.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="80.0" minHeight="10.0" prefHeight="47.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="209.0" minHeight="10.0" prefHeight="147.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label alignment="CENTER" contentDisplay="TOP" text="File Source" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
+            <SplitMenuButton mnemonicParsing="false" text="Select Algorithm" GridPane.columnIndex="1" GridPane.rowIndex="1">
+              <items>
+                <MenuItem mnemonicParsing="false" text="SHA-256" />
+                <MenuItem mnemonicParsing="false" text="MD5" />
+              </items>
+            </SplitMenuButton>
+            <Label prefHeight="17.0" prefWidth="90.0" text="Hash Algorithm" wrapText="true" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
+            <TextArea prefHeight="200.0" prefWidth="512.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <font>
+                  <Font name="Courier New" size="12.0" />
+               </font>
+            </TextArea>
+            <Label text="Message" GridPane.halignment="LEFT" GridPane.rowIndex="3" GridPane.valignment="TOP" />
+            <Button mnemonicParsing="false" text="Browse..." GridPane.columnIndex="1" />
+            <Label prefHeight="17.0" prefWidth="231.0" text="Label" translateX="70.0" GridPane.columnIndex="1" />
+            <Label text="Destination" GridPane.rowIndex="2" />
+            <Button mnemonicParsing="false" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <Label text="Label" translateX="70.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+         </children>
+      </GridPane>
+      <ButtonBar layoutX="250.0" layoutY="275.0" prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+          <Button mnemonicParsing="false" text="OK" />
+            <Button mnemonicParsing="false" onAction="#handleCancel" text="Cancel" />
+        </buttons>
+      </ButtonBar>
+   </children>
+</AnchorPane>
