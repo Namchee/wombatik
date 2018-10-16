@@ -61,7 +61,7 @@ public class App extends Application {
 	        
 	        encoderStage.showAndWait();
 	    } catch (IOException e) {
-	        System.out.println("Loading encoder window failed!");
+	        e.printStackTrace();
 	    }
 	}
 	

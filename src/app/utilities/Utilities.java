@@ -43,9 +43,9 @@ public class Utilities {
 		}
 	}
 	
-	public static byte[] createDigestByte (String str) {
+	public static byte[] createDigestByte (String str, String algorithm) {
 	    try {
-	        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+	        MessageDigest digest = MessageDigest.getInstance(algorithm);
 	        byte[] message = str.getBytes(StandardCharsets.UTF_8);
 	        return digest.digest(message);
 	    } catch (Exception e) {
@@ -54,8 +54,8 @@ public class Utilities {
 	    return null;
 	}
 	
-	public static String createMessageDigest (String str) {
-	    byte[] res = createDigestByte(str);
+	public static String createMessageDigest (String str, String algorithm) {
+	    byte[] res = createDigestByte(str, algorithm);
 	    StringBuffer hexString = new StringBuffer();
 
 	    for (int i = 0; i < res.length; i++) {

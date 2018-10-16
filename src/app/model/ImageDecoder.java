@@ -13,7 +13,7 @@ public class ImageDecoder extends ImageProcessor {
 		this.bit = 0;
 	}
 	
-	public String decode (String verification) {
+	public String decode (String verification, String algorithm) {
 		String res = "";
 		int x = 0;
 		int y = 0;
@@ -64,10 +64,9 @@ public class ImageDecoder extends ImageProcessor {
 			}
 		}
 		// CALCULATE DIGEST FOR TAMPER DETECTION
-		String messageDigest = Utilities.createMessageDigest(res);
+		String messageDigest = Utilities.createMessageDigest(res, algorithm);
 		if (!messageDigest.equals(verification)) {
-		    System.out.println("IMAGE IS TAMPERED!");
-		    System.exit(1);
+		    return null;
 		}
 		return res;
 	}

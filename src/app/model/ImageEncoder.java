@@ -47,8 +47,8 @@ public class ImageEncoder extends ImageProcessor {
 		return res;
 	}
 	
-	public String calculateDigest () {
-	    return Utilities.createMessageDigest(this.msg);
+	public String calculateDigest (String algorithm) {
+	    return Utilities.createMessageDigest(this.msg, algorithm);
 	}
 	
 	public double calculatePSNR (BufferedImage orig, BufferedImage mod) {
@@ -107,9 +107,9 @@ public class ImageEncoder extends ImageProcessor {
 		}
 		// create the encoded image
 		if (curChar < this.msg.length() || this.mask < 192) {
-			System.out.println("Image too small for this message! Embedding failed!");
-			System.exit(1);
+		    return null;
+		} else {
+		    return this.createResult();
 		}
-		return this.createResult();
 	}
 }
