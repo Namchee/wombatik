@@ -7,10 +7,6 @@ public class OverviewController {
     
     private App main;
     
-    public OverviewController() {
-        
-    }
-    
     @FXML
     private void initialize() {
         
@@ -25,7 +21,7 @@ public class OverviewController {
     private void handleDecode() {
         this.main.showDecoderWindow();
     }
-    
+
     public void setMainApp(App app) {
         this.main = app;
     }
