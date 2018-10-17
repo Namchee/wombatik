@@ -20,12 +20,12 @@
       </Label>
       <HBox alignment="CENTER" centerShape="false" layoutX="85.0" layoutY="93.0" prefHeight="100.0" prefWidth="330.0" spacing="100.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="50.0" AnchorPane.rightAnchor="50.0" AnchorPane.topAnchor="110.0">
          <children>
-          <Button mnemonicParsing="false" onAction="#handleDecode" prefHeight="60.0" prefWidth="125.0" text="Decode" textAlignment="JUSTIFY" HBox.hgrow="ALWAYS">
+            <Button mnemonicParsing="false" onAction="#handleEncode" prefHeight="60.0" prefWidth="125.0" text="Encode" textAlignment="JUSTIFY" HBox.hgrow="ALWAYS">
                <font>
                   <Font size="20.0" />
                </font>
             </Button>
-            <Button mnemonicParsing="false" onAction="#handleEncode" prefHeight="60.0" prefWidth="125.0" text="Encode" textAlignment="JUSTIFY" HBox.hgrow="ALWAYS">
+          <Button mnemonicParsing="false" onAction="#handleDecode" prefHeight="60.0" prefWidth="125.0" text="Decode" textAlignment="JUSTIFY" HBox.hgrow="ALWAYS">
                <font>
                   <Font size="20.0" />
                </font>

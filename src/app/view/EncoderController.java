@@ -1,8 +1,10 @@
 package app.view;
 
+import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -10,6 +12,7 @@ import app.model.ImageEncoder;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
@@ -184,6 +187,24 @@ public class EncoderController {
      
         alert.showAndWait();
         
-        this.encoderStage.close();
+        this.showImage(mod);
+        
+        alert.close();
+    }
+    
+    private void showImage(BufferedImage mod) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirmation Dialog");
+        alert.setHeaderText(null);
+        alert.setContentText("Watermarking successful, do you want to view the image now?");
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            try {
+                Desktop.getDesktop().open(this.dest);
+            } catch (IOException e) {
+                System.out.println("Failed to open result image");
+            }
+        } 
     }
 }
