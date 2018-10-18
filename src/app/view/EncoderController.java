@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
@@ -145,6 +146,8 @@ public class EncoderController {
     
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        Stage stage = (Stage)alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("warning.png"));
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -154,6 +157,8 @@ public class EncoderController {
     
     private void showSuccess(BufferedImage orig, BufferedImage mod) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Stage stage = (Stage)alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("info.png"));
         alert.setTitle("Successful");
         alert.setHeaderText("Secret message successfully embedded");
         alert.setContentText("Details below (press Show Details button)");

@@ -12,6 +12,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -97,6 +98,8 @@ public class DecoderController {
     
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        Stage stage = (Stage)alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("warning.png"));
         alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
@@ -106,6 +109,8 @@ public class DecoderController {
     
     private void notAuthorized() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
+        Stage stage = (Stage)alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("warning.png"));
         alert.setTitle("Error");
         alert.setHeaderText("You don't have the creative rights of this content");
         String res = "";
@@ -116,18 +121,16 @@ public class DecoderController {
         alert.setContentText(res);
         
         alert.showAndWait();
-        
-        this.decoderStage.close();
     }
     
     private void authorized() {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        Stage stage = (Stage)alert.getDialogPane().getScene().getWindow();
+        stage.getIcons().add(new Image("info.png"));
         alert.setTitle("Success");
         alert.setHeaderText(null);
         alert.setContentText("Success! The image is not tampered and you have creative right(s) on this content!");
         
         alert.showAndWait();
-        
-        this.decoderStage.close();
     }
 }

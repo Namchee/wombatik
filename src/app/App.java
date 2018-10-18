@@ -10,6 +10,7 @@ import app.view.RootController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
@@ -37,6 +38,7 @@ public class App extends Application {
 	        
 	        Scene mainScene = new Scene(this.rootLayout);
 	        this.primaryStage.setScene(mainScene);
+	        this.primaryStage.getIcons().add(new Image("wombat.png"));
 	        
 	        RootController controller = loader.getController();
 	        controller.setMainApp(this);
@@ -70,6 +72,7 @@ public class App extends Application {
 	        AnchorPane encoderWindow = (AnchorPane)loader.load();
 	        
 	        Stage encoderStage = new Stage();
+	        encoderStage.getIcons().add(new Image("wombat.png"));
 	        encoderStage.setTitle("Encode - Wombatik");
 	        encoderStage.initOwner(this.primaryStage);
 	        encoderStage.initModality(Modality.WINDOW_MODAL);
@@ -93,6 +96,7 @@ public class App extends Application {
 	        AnchorPane decoderWindow = (AnchorPane)loader.load();
 	        
 	        Stage decoderStage = new Stage();
+	        decoderStage.getIcons().add(new Image("wombat.png"));
 	        decoderStage.setTitle("Decoder - Wombatik");
 	        decoderStage.initOwner(this.primaryStage);
 	        decoderStage.initModality(Modality.WINDOW_MODAL);
@@ -116,6 +120,7 @@ public class App extends Application {
 	        AnchorPane pane = (AnchorPane)loader.load();
 	        
 	        Stage aboutStage = new Stage();
+	        aboutStage.getIcons().add(new Image("wombat.png"));
 	        aboutStage.initOwner(this.primaryStage);
 	        aboutStage.setTitle("About this cool app");
 	        aboutStage.initModality(Modality.WINDOW_MODAL);
