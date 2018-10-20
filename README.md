@@ -12,6 +12,6 @@ Selain hal-hal diatas, _watermark_ akan menyelesaikan masalah-masalah klasik dal
 
 Pada dasarnya, _pixel indicator technique_ merupakan teknik yang memanfaatkan _least significant bit_ untuk menyembunyikan _watermark_ pada gambar target (selanjutnya, akan disebut _carrier_) yang memiliki _channel_ RGB. Penjelasan mengenai teknik ini dapat dilihat melalui _flowchart_ dibawah ini.
 
-<h3><center>Menyisipkan <i>watermark</i></center></h3>
+<h3><p align="center">Menyisipkan <i>watermark</i></p></h3>
 
-<center><img src="https://i.imgur.com/LQYUyox.png" title="Algoritma penyisipan watermark" alt="algoritma_penyisipan" /></center>
+<p align="center"><img src="https://i.imgur.com/LQYUyox.png" title="Algoritma penyisipan watermark" alt="algoritma_penyisipan" /></p>
