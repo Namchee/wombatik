@@ -10,8 +10,8 @@ Selain hal-hal diatas, _watermark_ akan menyelesaikan masalah-masalah klasik dal
 
 > Supaya anda dapat memahami topik ini, ada baiknya bila anda memiliki pengetahuan dasar mengenai [_bit numbering_](https://en.wikipedia.org/wiki/Bit_numbering), [representasi gambar digital](<https://en.wikipedia.org/wiki/Channel_(digital_image)>),dan representasi [karakter _ASCII_](https://en.wikipedia.org/wiki/ASCII) terlebih dahulu.
 
-Pada dasarnya, _pixel indicator technique_ merupakan teknik yang memanfaatkan _least significant bit_ untuk menyembunyikan _watermark_ pada gambar target (selanjutnya, akan disebut _carrier_) yang memiliki _channel_ RGB. Penjelasan mengenai teknik ini dapat dilihat melalui _flowchart_ dibawah ini
+Pada dasarnya, _pixel indicator technique_ merupakan teknik yang memanfaatkan _least significant bit_ untuk menyembunyikan _watermark_ pada gambar target (selanjutnya, akan disebut _carrier_) yang memiliki _channel_ RGB. Penjelasan mengenai teknik ini dapat dilihat melalui _flowchart_ dibawah ini.
 
-<h3><center>Menyisipkan <i>watermark</i></center>></h3>
+<h3><center>Menyisipkan <i>watermark</i></center></h3>
 
-<center>![algoritma_penyisipan](https://i.imgur.com/LQYUyox.png)</center>
+<center><img src="https://i.imgur.com/LQYUyox.png" title="Algoritma penyisipan watermark" alt="algoritma_penyisipan" /></center>
