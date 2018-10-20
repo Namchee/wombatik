@@ -12,6 +12,19 @@ Selain hal-hal diatas, _watermark_ akan menyelesaikan masalah-masalah klasik dal
 
 Pada dasarnya, _pixel indicator technique_ merupakan teknik yang memanfaatkan _least significant bit_ untuk menyembunyikan _watermark_ pada gambar target (selanjutnya, akan disebut _carrier_) yang memiliki _channel_ RGB. Penjelasan mengenai teknik ini dapat dilihat melalui _flowchart_ dibawah ini.
 
-<h3><p align="center">Menyisipkan <i>watermark</i></p></h3>
+<b><p align="center">Tabel Penentuan pemilihan <i>channel</i></p></b>
+
+| Tipe panjang pesan | Channel Indikator | Channel 1 & 2 apabila jumlah parity bit ganjil | Channel 1 & 2 apabila jumlah parity bit genap |
+|:------------------:|:-----------------:|:----------------------------------------------:|:---------------------------------------------:|
+|   Bilangan Genap   |       Merah       |                   Hijau, Biru                  |                  Biru, Hijau                  |
+|   Bilangan Ganjil  |        Biru       |                  Merah, Hijau                  |                  Hijau, Merah                 |
+|   Bukan Keduanya   |       Hijau       |                   Merah, Biru                  |                  Biru, Merah                  |
+
+<b><p align="center">Menyisipkan <i>watermark</i></p></b>
 
 <p align="center"><img src="https://i.imgur.com/LQYUyox.png" title="Algoritma penyisipan watermark" alt="algoritma_penyisipan" /></p>
+
+<b><p align="center">Mengambil <i>watermark</i></p></b>
+
+<p align="center"><img src="https://pictr.com/images/2018/10/20/01Fz6B.png" title="Algoritma pengambilan watermark" alt="algoritma_pengambilan" /></p>
+
