@@ -8,9 +8,6 @@ Selain hal-hal diatas, _watermark_ akan menyelesaikan masalah-masalah klasik dal
 
 ## Pixel Indicator Technique
 
-> Supaya anda dapat memahami topik ini, ada baiknya bila anda memiliki pengetahuan dasar mengenai [_bit numbering_](https://en.wikipedia.org/wiki/Bit_numbering) ,konsep [_least significant bit_](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_bit), [representasi gambar digital](digital_image),dan representasi [karakter _ASCII_](https://en.wikipedia.org/wiki/ASCII) terlebih dahulu
+> Supaya anda dapat memahami topik ini, ada baiknya bila anda memiliki pengetahuan dasar mengenai [_bit numbering_](https://en.wikipedia.org/wiki/Bit_numbering) ,konsep [_least significant bit_](https://en.wikipedia.org/wiki/Bit_numbering#Least_significant_bit), [representasi gambar digital](<https://en.wikipedia.org/wiki/Channel_(digital_image)>),dan representasi [karakter _ASCII_](https://en.wikipedia.org/wiki/ASCII) terlebih dahulu
 
 Pada dasarnya, _pixel indicator technique_ merupakan teknik yang memanfaatkan _least significant bit_ untuk menyembunyikan _watermark_ pada gambar target (selanjutnya, akan disebut _carrier_)
-
-
-[digital_image]: https://en.wikipedia.org/wiki/Channel_(digital_image)
