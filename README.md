@@ -28,3 +28,20 @@ Pada dasarnya, _pixel indicator technique_ merupakan teknik yang memanfaatkan _l
 
 <p align="center"><img src="https://pictr.com/images/2018/10/20/01Fz6B.png" title="Algoritma pengambilan watermark" alt="algoritma_pengambilan" /></p>
 
+## Batasan
+
+- _semi-fragile_ (perubahan yang besar pada gambar akan merusak gambar), sehingga hanya bisa menghasilkan gambar dengan _format_ `bmp`
+- Hanya mampu menyisipkan _watermark_ pada gambar dengan _channel_ RGB saja (bagaimana dengan CMYK, atau _grayscale_?)
+- Hanya mampu menyisipkan _watermark_ maksimal 255 karakter.
+
+## Requirements
+
+- Java, minimal versi 8
+- Gambar dan _watermark_ tentunya
+
+## Special Thanks
+
+- Mariskha Tri Adithia
+- Kristopher David Harjono
+- Samuel Lusandi
+- Gunawan Christanto
