@@ -97,7 +97,7 @@ public class EncoderController {
         FileChooser dest = new FileChooser();
         dest.setTitle("Select destination...");
         dest.setInitialDirectory(new File(System.getProperty("user.home")));
-        dest.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image", "*.bmp"));
+        dest.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image (*.bmp)", "*.bmp"));
         dest.setInitialFileName("*.bmp");
         File result = dest.showSaveDialog(new Stage());
         if (result != null) {
