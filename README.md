@@ -30,7 +30,7 @@ Pada dasarnya, _pixel indicator technique_ merupakan teknik yang memanfaatkan _l
 
 <b><p align="center">Menyisipkan <i>watermark</i></p></b>
 
-<p align="center"><img src="https://i.imgur.com/LQYUyox.png" title="Algoritma penyisipan watermark" alt="algoritma_penyisipan" /></p>
+<p align="center"><img src="https://ibb.co/bPXgOA" title="Algoritma penyisipan watermark" alt="algoritma_penyisipan" /></p>
 
 <b><p align="center">Mengambil <i>watermark</i></p></b>
 
