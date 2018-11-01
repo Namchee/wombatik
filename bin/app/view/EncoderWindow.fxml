@@ -30,7 +30,7 @@
          <children>
             <Label alignment="CENTER" contentDisplay="TOP" text="Source" GridPane.halignment="LEFT" GridPane.valignment="CENTER" />
             <Label prefHeight="17.0" prefWidth="90.0" text="Hash Algorithm" wrapText="true" GridPane.halignment="LEFT" GridPane.rowIndex="1" />
-            <TextArea fx:id="message" prefHeight="67.0" prefWidth="318.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <TextArea fx:id="watermarkInput" prefHeight="67.0" prefWidth="318.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <font>
                   <Font name="Courier New" size="12.0" />
                </font>
@@ -45,7 +45,7 @@
 
             </MenuButton>
             <Label text="Watermark File" GridPane.rowIndex="5" />
-            <Button mnemonicParsing="false" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <Button mnemonicParsing="false" onAction="#chooseWatermark" text="Browse..." GridPane.columnIndex="1" GridPane.rowIndex="5" />
             <Label fx:id="watermarkSourceLabel" prefHeight="17.0" prefWidth="231.0" text="Label" GridPane.columnIndex="1" GridPane.rowIndex="5">
                <GridPane.margin>
                   <Insets left="70.0" />

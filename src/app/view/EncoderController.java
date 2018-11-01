@@ -4,8 +4,11 @@ import java.util.Calendar;
 
 import java.awt.Desktop;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -48,12 +51,15 @@ public class EncoderController {
     private MenuButton algorithm;
     
     @FXML
-    private TextArea message;
+    private TextArea watermarkInput;
     
     private File source;
     private File dest;
+    private File watermarkSource;
     private Stage encoderStage;
     private ImageEncoder encoder;
+    
+    private String watermark;
     
     @FXML
     private void initialize() { 
@@ -74,7 +80,7 @@ public class EncoderController {
                 this.algorithm.setText(item.getText());
             });
         }
-        this.characterCount.textProperty().bind(Bindings.length(this.message.textProperty()).asString());
+        this.characterCount.textProperty().bind(Bindings.length(this.watermarkInput.textProperty()).asString());
     }
     
     @FXML
@@ -117,19 +123,31 @@ public class EncoderController {
     }
     
     @FXML
+    private void chooseWatermark() {
+        FileChooser source = new FileChooser();
+        source.setTitle("Select watermark file...");
+        source.setInitialDirectory(new File(System.getProperty("user.home")));
+        source.getExtensionFilters().addAll(
+            new FileChooser.ExtensionFilter("Text File (.txt)", "*.txt"));
+        File selected = source.showOpenDialog(new Stage());
+        if (selected != null) {
+            this.watermarkSourceLabel.setText(selected.getName());
+            this.watermarkSource = selected;
+        }
+    }
+    
+    @FXML
     private void handleOK() {
-        String msg = this.message.getText();
-        if (this.dest == null || this.source == null || this.algorithm.getText().equals("Select Algorithm...")) {
+        this.determineWatermark();
+        if (this.dest == null || this.source == null || this.watermark == null) {
             this.showError("Please select source file, hash algorithm, and destination file correctly");
-        } else if (msg.length() > 65536) {
+        } else if (this.watermark.length() > 65536) {
             this.showError("The message must not be longer than 65.536 character(s)");
-        } else if (msg.isEmpty()) {
-            this.showError("The message must not be empty");
         } else {
             // format correct!
             try {
                 BufferedImage source = ImageIO.read(this.source);
-                this.encoder = new ImageEncoder(source, msg);
+                this.encoder = new ImageEncoder(source, this.watermark);
                 BufferedImage res = this.encoder.encode();
                 if (res == null) {
                     this.showError("Failed to embed message, the message is too long for the source image");
@@ -179,7 +197,7 @@ public class EncoderController {
         res += "Source Path : " + this.source.getPath() + "\n";
         res += "Destination Path : " + this.dest.getPath() + "\n";
         res += "Message Embedded :\n\n";
-        res += this.message.getText() + "\n\n";
+        res += this.watermark + "\n\n";
         res += "Quality Measurements (PSNR) : " + String.format("%.5f", this.encoder.calculatePSNR(orig, mod)) + " dB\n";
         res += "Message Digest (" + this.algorithm.getText() + ") : " + this.encoder.calculateDigest(this.algorithm.getText()) + "\n\n";
         res += "---DO NOT LOSE THE DIGEST!!!---\n";
@@ -250,12 +268,71 @@ public class EncoderController {
                 BufferedWriter writer;
                 try {
                     writer = new BufferedWriter(new FileWriter(destination));
-                    writer.write(log);
+                    String[] realLog = log.split("\n");
+                    for (int i = 0; i < realLog.length; i++) {
+                        writer.write(realLog[i]);
+                        writer.newLine();
+                    }
                     writer.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
         }
+    }
+    
+    private void determineWatermark() {
+        if (this.watermarkInput.getText().isEmpty() && this.watermarkSource == null) this.watermark = null;
+        else if (!this.watermarkInput.getText().isEmpty() && this.watermarkSource == null) this.watermark = this.watermarkInput.getText();
+        else if (this.watermarkInput.getText().isEmpty() && this.watermarkSource != null) {
+            if (this.getWatermarkFromFile() == null) {
+                this.handleWatermarkError();
+            } else {
+                this.watermark = this.getWatermarkFromFile();
+            }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Choose Watermark Source");
+            alert.setHeaderText(null);
+            alert.setContentText("From where do you want get the watermark from?");
+            
+            ButtonType manual = new ButtonType("Manual Input");
+            ButtonType file = new ButtonType("File");
+            
+            alert.getButtonTypes().setAll(manual, file);
+            
+            Optional<ButtonType> choice = alert.showAndWait();
+            
+            if (choice.get() == manual) this.watermark = this.watermarkInput.getText();
+            else {
+                if (this.getWatermarkFromFile() == null) this.handleWatermarkError();
+                else this.watermark = this.getWatermarkFromFile();
+            }
+        }
+    }
+    
+    private String getWatermarkFromFile() {
+        String help;
+        String watermark = "";
+        BufferedReader rd;
+        try {
+            rd = new BufferedReader(new FileReader(this.watermarkSource));
+            try {
+                while ((help = rd.readLine()) != null) {
+                    if (!watermark.isEmpty()) watermark += "\n";
+                    watermark += help;
+                }
+                rd.close();
+                return watermark;
+            } catch (IOException e) {
+                return null;
+            }
+        } catch (FileNotFoundException e) {
+            return null;
+        }
+    }
+    
+    private void handleWatermarkError() {
+        this.showError("Error reading watermark from source file");
     }
 }
