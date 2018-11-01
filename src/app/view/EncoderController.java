@@ -1,9 +1,15 @@
 package app.view;
 
+import java.util.Calendar;
+
 import java.awt.Desktop;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Optional;
 
 import javax.imageio.ImageIO;
@@ -33,6 +39,9 @@ public class EncoderController {
     private Label fileDestLabel;
     
     @FXML
+    private Label watermarkSourceLabel;
+    
+    @FXML
     private Label characterCount;
     
     @FXML
@@ -52,6 +61,7 @@ public class EncoderController {
         this.dest = null;
         this.fileSourceLabel.setText("");
         this.fileDestLabel.setText("");
+        this.watermarkSourceLabel.setText("");
         MenuItem md1 = new MenuItem("MD2");
         MenuItem md5 = new MenuItem("MD5");
         MenuItem sha1 = new MenuItem("SHA-1");
@@ -111,8 +121,8 @@ public class EncoderController {
         String msg = this.message.getText();
         if (this.dest == null || this.source == null || this.algorithm.getText().equals("Select Algorithm...")) {
             this.showError("Please select source file, hash algorithm, and destination file correctly");
-        } else if (msg.length() > 255) {
-            this.showError("The message must not be longer than 255 character(s)");
+        } else if (msg.length() > 65536) {
+            this.showError("The message must not be longer than 65.536 character(s)");
         } else if (msg.isEmpty()) {
             this.showError("The message must not be empty");
         } else {
@@ -165,7 +175,7 @@ public class EncoderController {
         
         // generate the message
         String res = "Message embedding successful\n\n";
-        res += "Time : " + java.util.Calendar.getInstance().getTime() + "\n";  
+        res += "Time : " + Calendar.getInstance().getTime() + "\n";  
         res += "Source Path : " + this.source.getPath() + "\n";
         res += "Destination Path : " + this.dest.getPath() + "\n";
         res += "Message Embedded :\n\n";
@@ -192,6 +202,8 @@ public class EncoderController {
      
         alert.showAndWait();
         
+        this.createLog(res);
+        
         this.showImage(mod);
         
         alert.close();
@@ -199,17 +211,51 @@ public class EncoderController {
     
     private void showImage(BufferedImage mod) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Confirmation Dialog");
+        alert.setTitle("View Image Now?");
         alert.setHeaderText(null);
-        alert.setContentText("Watermarking successful, do you want to view the image now?");
+        alert.setContentText("Watermark embedding completed successfully, do you want to view the image now?");
 
+        ButtonType yes = new ButtonType("Yes");
+        ButtonType no = new ButtonType("No");
+        alert.getButtonTypes().setAll(yes, no);
+        
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
+        if (result.get() == yes){
             try {
                 Desktop.getDesktop().open(this.dest);
             } catch (IOException e) {
                 System.out.println("Failed to open result image");
             }
         } 
+    }
+    
+    private void createLog(String log) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Create Log?");
+        alert.setHeaderText(null);
+        alert.setContentText("Would you like to create a log?");
+        
+        ButtonType yes = new ButtonType("Yes");
+        ButtonType no = new ButtonType("No");
+        alert.getButtonTypes().setAll(yes, no);
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == yes) {
+            FileChooser dest = new FileChooser();
+            dest.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Document (*.txt)", "*.txt"));
+            DateFormat format = new SimpleDateFormat("yyyyMMdd");
+            dest.setInitialFileName("watermark_log_" + format.format(Calendar.getInstance().getTime()) +".txt");
+            File destination = dest.showSaveDialog(new Stage());
+            if (destination != null) {
+                BufferedWriter writer;
+                try {
+                    writer = new BufferedWriter(new FileWriter(destination));
+                    writer.write(log);
+                    writer.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

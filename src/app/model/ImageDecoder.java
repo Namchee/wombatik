@@ -14,12 +14,13 @@ public class ImageDecoder extends ImageProcessor {
 	}
 	
 	public String decode (String verification, String algorithm) {
+	    int bit = ((this.pixels[0][0][0] & 0x2) == 2) ? 0x10 : 0x8;
 		String res = "";
 		int x = 0;
 		int y = 0;
 		int len = 0;
 		// first, let's get the length of secret data
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < bit; i++) {
 			len = (len << 1) + (this.pixels[x][y][i % 3] & 1);
 			y++;
 			if (y >= this.pixels[0].length) {
@@ -27,6 +28,7 @@ public class ImageDecoder extends ImageProcessor {
 				x++;
 			}
 		}
+		if (len == 0) len = 0x10000;
 		int indicator = Utilities.getIndicatorChannel(len);
 		int first = Utilities.getFirstChannel(len);
 		int second = Utilities.getSecondChannel(len);
@@ -72,7 +74,7 @@ public class ImageDecoder extends ImageProcessor {
 	}
 	
 	private void extractBits (int x, int y, int channel) {
-		this.code = (this.code << 2) + (this.pixels[x][y][channel] & 3);
+		this.code = (this.code << 0x2) + (this.pixels[x][y][channel] & 0x3);
 		this.bit += 2;
 	}
 	
