@@ -47,6 +47,11 @@ Pada dasarnya, _pixel indicator technique_ merupakan teknik yang memanfaatkan _l
 - Java, minimal versi 8
 - Gambar dan _watermark_ tentunya
 
+## Changelog
+
+- v1.1, menambah batas watermark menjadi 64 KB, kemudahan _upload_ watermark melalui _file_, dan kemampuan untuk membuat _log_
+- v1.0, initial release
+
 ## Special Thanks
 
 - Mariskha Tri Adithia
