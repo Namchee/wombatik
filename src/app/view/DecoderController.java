@@ -15,6 +15,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class DecoderController {
     
@@ -52,14 +53,12 @@ public class DecoderController {
         FileChooser source = new FileChooser();
         source.setTitle("Select source...");
         source.setInitialDirectory(new File(System.getProperty("user.home")));
-        source.getExtensionFilters().addAll(
-            new FileChooser.ExtensionFilter("Image Files", 
-                "*.jpg", 
-                "*.jpeg",
-                "*.gif",
-                "*.png",
-                "*.bmp")
-        );
+        
+        ExtensionFilter bmp = new FileChooser.ExtensionFilter("BMP Images (*.bmp)", "*.bmp");
+        ExtensionFilter png = new FileChooser.ExtensionFilter("PNG Images (*.png)", "*.png");
+        
+        source.getExtensionFilters().addAll(bmp, png);
+        
         File selected = source.showOpenDialog(new Stage());
         if (selected != null) {
             this.fileSourceLabel.setText(selected.getName());
@@ -74,12 +73,11 @@ public class DecoderController {
         } else {
             try {
                 ImageDecoder decoder = new ImageDecoder(ImageIO.read(this.source));
-                String res = decoder.decode(this.hash.getText(), this.algorithm.getText());
-                if (res == null) {
+                boolean res = decoder.decode_v2(this.hash.getText(), this.algorithm.getText());
+                if (!res) 
                     this.notAuthorized();
-                } else {
+                else                
                     this.authorized();
-                }
             } catch (IOException e) {
                 this.showError("Failed to read source image, either the image is non-existent or you don't have permission to read it");
             }

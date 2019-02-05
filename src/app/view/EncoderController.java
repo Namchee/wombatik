@@ -31,6 +31,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class EncoderController {
@@ -97,7 +98,6 @@ public class EncoderController {
             new FileChooser.ExtensionFilter("Image Files", 
                 "*.jpg", 
                 "*.jpeg",
-                "*.gif",
                 "*.png",
                 "*.bmp")
         );
@@ -111,11 +111,17 @@ public class EncoderController {
     @FXML
     private void chooseDest() {
         FileChooser dest = new FileChooser();
+        
         dest.setTitle("Select destination...");
         dest.setInitialDirectory(new File(System.getProperty("user.home")));
-        dest.getExtensionFilters().add(new FileChooser.ExtensionFilter("BMP Image (*.bmp)", "*.bmp"));
-        dest.setInitialFileName("*.bmp");
+        
+        ExtensionFilter bmp = new FileChooser.ExtensionFilter("BMP Images (*.bmp)", "*.bmp");
+        ExtensionFilter png = new FileChooser.ExtensionFilter("PNG Images (*.png)", "*.png");
+        
+        dest.getExtensionFilters().addAll(bmp, png);
+        
         File result = dest.showSaveDialog(new Stage());
+        
         if (result != null) {
             this.dest = result;
             this.fileDestLabel.setText(result.getName());
@@ -139,6 +145,7 @@ public class EncoderController {
     @FXML
     private void handleOK() {
         this.determineWatermark();
+        
         if (this.dest == null || this.source == null || this.watermark == null) {
             this.showError("Please select source file, hash algorithm, and destination file correctly");
         } else if (this.watermark.length() > 65536) {
@@ -148,12 +155,14 @@ public class EncoderController {
             try {
                 BufferedImage source = ImageIO.read(this.source);
                 this.encoder = new ImageEncoder(source, this.watermark);
-                BufferedImage res = this.encoder.encode();
+                BufferedImage res = this.encoder.encode_v2();
+                
                 if (res == null) {
                     this.showError("Failed to embed message, the message is too long for the source image");
                 } else {
                     try {
-                        ImageIO.write(res, "bmp", this.dest);
+                        // BUG HERE
+                        ImageIO.write(res, "png", this.dest);
                         
                         // successful
                         this.showSuccess(ImageIO.read(this.source), res);
@@ -199,7 +208,7 @@ public class EncoderController {
         res += "Message Embedded :\n\n";
         res += this.watermark + "\n\n";
         res += "Quality Measurements (PSNR) : " + String.format("%.5f", this.encoder.calculatePSNR(orig, mod)) + " dB\n";
-        res += "Message Digest (" + this.algorithm.getText() + ") : " + this.encoder.calculateDigest(this.algorithm.getText()) + "\n\n";
+        res += "Message Digest (" + this.algorithm.getText() + ") : " + this.encoder.createMessageDigest(this.watermark, this.algorithm.getText()) + "\n\n";
         res += "---DO NOT LOSE THE DIGEST!!!---\n";
         
         TextArea textArea = new TextArea(res);
@@ -282,8 +291,12 @@ public class EncoderController {
     }
     
     private void determineWatermark() {
-        if (this.watermarkInput.getText().isEmpty() && this.watermarkSource == null) this.watermark = null;
-        else if (!this.watermarkInput.getText().isEmpty() && this.watermarkSource == null) this.watermark = this.watermarkInput.getText();
+        if (this.watermarkInput.getText().isEmpty() && this.watermarkSource == null) 
+            this.watermark = null;
+        
+        else if (!this.watermarkInput.getText().isEmpty() && this.watermarkSource == null) 
+            this.watermark = this.watermarkInput.getText();
+        
         else if (this.watermarkInput.getText().isEmpty() && this.watermarkSource != null) {
             if (this.getWatermarkFromFile() == null) {
                 this.handleWatermarkError();
