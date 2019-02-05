@@ -75,6 +75,7 @@ public class ImageDecoder extends ImageProcessor {
 	}
 	
 	private void extractBits (int x, int y, int channel) {
+	    // System.out.printf("src : %d\n", this.pixels[x][y][channel]);
 		this.code = (this.code << 2) + (this.pixels[x][y][channel] & 0x03);
 		this.bit += 2;
 	}
@@ -85,6 +86,47 @@ public class ImageDecoder extends ImageProcessor {
 		this.bit = 0;
 		return c;
 	}	
+	
+	private int[] getStartProperties (int layer) {
+	    int x, y, idx, increment = 1;
+	    int[] res = new int[4];
+	    
+	    int top = this.pixels[layer][layer][0] & 0x04;
+        int right = this.pixels[layer][this.pixels.length - layer - 1][0] & 0x04;
+        int bottom = this.pixels[this.pixels.length - layer - 1][this.pixels.length - layer - 1][0] & 0x04;
+        
+        if (top > 0) {
+            x = layer;
+            y = layer;            
+            idx = 0;
+        } else if (right > 0) {
+            x = layer;
+            y = this.pixels.length - layer - 1;            
+            idx = 1;
+        } else if (bottom > 0) {
+            x = this.pixels.length - layer - 1;
+            y = this.pixels.length - layer - 1;     
+            idx = 2;
+        } else {
+            x = this.pixels.length - layer - 1;
+            y = layer;
+            idx = 3;
+        }
+        
+        if ((this.pixels[x][y][1] & 0x04) == 0) {
+            increment = 1;
+            idx++;
+            if (idx >= 4)
+                idx = 0;
+        }
+        
+        res[0] = x;
+        res[1] = y;
+        res[2] = idx;
+        res[3] = increment;
+        
+        return res;
+	}
 
 	public boolean decode_v2 (String verification, String algorithm) {
 	    int layer = this.pixels.length / 2;
@@ -92,49 +134,13 @@ public class ImageDecoder extends ImageProcessor {
 	    String res = "";
 	    int len = 0;
 	    int x, y, start_x, start_y;
-	    int idx, c_idx = 0, increment = 1;
+	    int idx, increment, c_idx = 0;
 	    
-	    int top = this.pixels[cur_layer][cur_layer][0] & 0x04;
-        int right = this.pixels[cur_layer][this.pixels.length - cur_layer - 1][0] & 0x04;
-        int bottom = this.pixels[this.pixels.length - cur_layer - 1][this.pixels.length - cur_layer - 1][0] & 0x04;
-        
-        if (top > 0) {
-            x = cur_layer;
-            y = cur_layer;
-            
-            idx = 0;
-            if ((this.pixels[x][y][1] & 0x04) == 0) {
-                idx = 1;
-                increment = -1;
-            }
-        } else if (right > 0) {
-            x = cur_layer;
-            y = this.pixels.length - cur_layer - 1;
-            
-            idx = 1;
-            if ((this.pixels[x][y][1] & 0x04) == 0) {
-                idx = 2;
-                increment = -1;
-            }
-        } else if (bottom > 0) {
-            x = this.pixels.length - cur_layer - 1;
-            y = this.pixels.length - cur_layer - 1;
-            
-            idx = 2;
-            if ((this.pixels[x][y][1] & 0x04) == 0) {
-                idx = 3;
-                increment = -1;
-            }
-        } else {
-            x = this.pixels.length - cur_layer - 1;
-            y = cur_layer;
-            idx = 3;
-            
-            if ((this.pixels[x][y][1] & 0x04) == 0) {
-                idx = 0;
-                increment = -1;
-            }
-        }
+	    int[] props = this.getStartProperties(cur_layer);
+	    x = props[0];
+	    y = props[1];
+	    idx = props[2];
+	    increment = props[3];
         
         start_x = x;
         start_y = y;
@@ -163,47 +169,12 @@ public class ImageDecoder extends ImageProcessor {
 	        
 	        if (x == start_x && y == start_y) { // highly unlikely
 	            cur_layer++;
-	            top = this.pixels[cur_layer][cur_layer][0] & 0x04;
-	            right = this.pixels[cur_layer][this.pixels.length - cur_layer - 1][0] & 0x04;
-	            bottom = this.pixels[this.pixels.length - cur_layer - 1][this.pixels.length - cur_layer - 1][0] & 0x04;
 	            
-	            if (top > 0) {
-	                x = cur_layer;
-	                y = cur_layer;
-	                
-	                idx = 0;
-	                if ((this.pixels[x][y][1] & 0x04) == 0) {
-	                    idx = 1;
-	                    increment = -1;
-	                }
-	            } else if (right > 0) {
-	                x = cur_layer;
-	                y = this.pixels.length - cur_layer - 1;
-	                
-	                idx = 1;
-	                if ((this.pixels[x][y][1] & 0x04) == 0) {
-	                    idx = 2;
-	                    increment = -1;
-	                }
-	            } else if (bottom > 0) {
-	                x = this.pixels.length - cur_layer - 1;
-	                y = this.pixels.length - cur_layer - 1;
-	                
-	                idx = 2;
-	                if ((this.pixels[x][y][1] & 0x04) == 0) {
-	                    idx = 3;
-	                    increment = -1;
-	                }
-	            } else {
-	                x = this.pixels.length - cur_layer - 1;
-	                y = cur_layer;
-	                idx = 3;
-	                
-	                if ((this.pixels[x][y][1] & 0x04) == 0) {
-	                    idx = 0;
-	                    increment = -1;
-	                }
-	            }
+	            props = this.getStartProperties(cur_layer);
+	            x = props[0];
+	            y = props[1];
+	            idx = props[2];
+	            increment = props[3];
 	            
 	            start_x = x;
 	            start_y = y;
@@ -213,13 +184,14 @@ public class ImageDecoder extends ImageProcessor {
 	    if (len == 0)
 	        len = 0x10000;
 	    
-	    System.out.println(len);
+	    // System.out.println(len);
 	    
 	    this.initChannel(len);
 	    
 	    while (cur_layer <= layer && res.length() < len) {
-	        System.out.printf("Bit pos: %d %d\n", x, y);
-	        System.out.println("START");
+	        // System.out.printf("%d %d\n", x, y);
+	        // System.out.printf("Bit pos: %d %d\n", x, y);
+	        // System.out.println("START");
 	        
 	        int id = this.pixels[x][y][this.indicator_channel[c_idx]] & 0x3;
 	        
@@ -228,20 +200,20 @@ public class ImageDecoder extends ImageProcessor {
 	                break;
 	            }
 	            case 1: {
-	                System.out.println("One");
+	                // System.out.println("first");
 	                this.extractBits(x, y, this.first_channel[c_idx]);
 	                break;
 	            }
 	            case 2: {
-	                System.out.println("Two");
+	                // System.out.println("second");
 	                this.extractBits(x, y, this.second_channel[c_idx]);
 	                break;
 	            }
 	            default: {
-	                System.out.println("Both");
+	                // System.out.println("both");
 	                this.extractBits(x, y, this.first_channel[c_idx]);
-	                if (this.bit == 8)
-	                    res += this.getChar();
+	                if (this.bit == 8) 
+	                    res += this.getChar();	                
 	                
 	                if (res.length() < len)
 	                    this.extractBits(x, y, this.second_channel[c_idx]);
@@ -250,9 +222,9 @@ public class ImageDecoder extends ImageProcessor {
 	            }
 	        }
 	        
-	        if (this.bit == 8)
+	        if (this.bit == 8) 
 	            res += this.getChar();
-	        
+	        	        
 	        c_idx++;
 	        if (c_idx >= 3)
 	            c_idx = 0;
@@ -276,56 +248,21 @@ public class ImageDecoder extends ImageProcessor {
 	        
 	        if (x == start_x && y == start_y) {
                 cur_layer++;
-                top = this.pixels[cur_layer][cur_layer][0] & 0x04;
-                right = this.pixels[cur_layer][this.pixels.length - cur_layer - 1][0] & 0x04;
-                bottom = this.pixels[this.pixels.length - cur_layer - 1][this.pixels.length - cur_layer - 1][0] & 0x04;
+                if (cur_layer > layer)
+                    break;
                 
-                if (top > 0) {
-                    x = cur_layer;
-                    y = cur_layer;
-                    
-                    idx = 0;
-                    if ((this.pixels[x][y][1] & 0x04) == 0) {
-                        idx = 1;
-                        increment = -1;
-                    }
-                } else if (right > 0) {
-                    x = cur_layer;
-                    y = this.pixels.length - cur_layer - 1;
-                    
-                    idx = 1;
-                    if ((this.pixels[x][y][1] & 0x04) == 0) {
-                        idx = 2;
-                        increment = -1;
-                    }
-                } else if (bottom > 0) {
-                    x = this.pixels.length - cur_layer - 1;
-                    y = this.pixels.length - cur_layer - 1;
-                    
-                    idx = 2;
-                    if ((this.pixels[x][y][1] & 0x04) == 0) {
-                        idx = 3;
-                        increment = -1;
-                    }
-                } else {
-                    x = this.pixels.length - cur_layer - 1;
-                    y = cur_layer;
-                    idx = 3;
-                    
-                    if ((this.pixels[x][y][1] & 0x04) == 0) {
-                        idx = 0;
-                        increment = -1;
-                    }
-                }
+                props = this.getStartProperties(cur_layer);
+                x = props[0];
+                y = props[1];
+                idx = props[2];
+                increment = props[3];
                 
                 start_x = x;
                 start_y = y;
             }
-	        
-	        System.out.println(this.bit);
 	    }
 	    
-	    System.out.println(res);
+	    // System.out.println(res);
 	    
 	    String messageDigest = this.createMessageDigest(res, algorithm);
 	    return messageDigest.equals(verification);
