@@ -114,7 +114,7 @@ public class ImageDecoder extends ImageProcessor {
         }
         
         if ((this.getGreen(x, y) & 0x04) == 0) {
-            increment = 1;
+            increment = -1;
             idx++;
             if (idx >= 4)
                 idx = 0;
@@ -232,6 +232,7 @@ public class ImageDecoder extends ImageProcessor {
 	        
 	        x += this.DIRECTION_X[idx];
 	        y += this.DIRECTION_Y[idx];
+	        
 	        
 	        if (this.isLimit(x, y, cur_layer)) {
                 x -= this.DIRECTION_X[idx];

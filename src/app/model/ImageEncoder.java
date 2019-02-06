@@ -32,7 +32,7 @@ public class ImageEncoder extends ImageProcessor {
     }
 
     private void setLength(int x, int y, int channel, int shift) {
-        System.out.println(x + " " + y);
+        // System.out.println(x + " " + y);
         int clean = this.getColor(x, y, channel) & 0xFE; // 254
         int secret = (this.msg.length() >> shift) & 1;
         clean += ((this.msg.length() == 0x10000) ? 0 : secret); // 65.536
