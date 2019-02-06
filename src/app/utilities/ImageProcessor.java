@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 public class ImageProcessor {
-	protected int[][][] pixels;
+	protected int[][] pixels;
 	
 	// V2 only
 	protected int[] indicator_channel;
@@ -18,14 +18,17 @@ public class ImageProcessor {
 	public ImageProcessor (BufferedImage img) {
 		int width = img.getWidth();
 		int height = img.getHeight();
-		this.pixels = new int[width][height][3];
+		this.pixels = new int[width][height];
 		
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
 				Color cols = new Color(img.getRGB(x, y));
-				this.pixels[x][y][0] = cols.getRed();
-				this.pixels[x][y][1] = cols.getGreen();
-				this.pixels[x][y][2] = cols.getBlue();
+				this.pixels[x][y] += cols.getRed();
+				this.pixels[x][y] = (this.pixels[x][y] << 8) + cols.getGreen();
+				this.pixels[x][y] = (this.pixels[x][y] << 8) + cols.getBlue();
+				// this.pixels[x][y][0] = cols.getRed();
+				// this.pixels[x][y][1] = cols.getGreen();
+				// this.pixels[x][y][2] = cols.getBlue();
 			}
 		}
 	}
@@ -101,7 +104,7 @@ public class ImageProcessor {
         return hexString.toString();
     }
     
-    public double calculateMSE (BufferedImage orig, BufferedImage mod) {
+    private double calculateMSE (BufferedImage orig, BufferedImage mod) {
         double res = 0.0;
         int width = orig.getWidth();
         int height = orig.getHeight();
@@ -119,6 +122,51 @@ public class ImageProcessor {
     
     public double calculatePSNR (BufferedImage orig, BufferedImage mod) {
         return 10 * Math.log10(Math.pow(255, 2) / this.calculateMSE(orig, mod));
+    }
+    
+    protected int getRed (int x, int y) {
+        return (this.pixels[x][y] & 0xFF0000) >> 16;
+    }
+    
+    protected int getGreen (int x, int y) {
+        return (this.pixels[x][y] & 0x00FF00) >> 8;
+    }
+    
+    protected int getBlue (int x, int y) {
+        return (this.pixels[x][y] & 0x0000FF);
+    }
+    
+    protected int getColor (int x, int y, int channel) {
+        if (channel == 0)
+            return this.getRed(x, y);
+        else if (channel == 1)
+            return this.getGreen(x, y);
+        else
+            return this.getBlue(x, y);
+    }
+    
+    protected void setRed (int x, int y, int value) {
+        this.pixels[x][y] &= 0x00FFFF;
+        this.pixels[x][y] += (value << 16);
+    }
+    
+    protected void setGreen (int x, int y, int value) {
+        this.pixels[x][y] &= 0xFF00FF;
+        this.pixels[x][y] += (value << 8);
+    }
+    
+    protected void setBlue (int x, int y, int value) {
+        this.pixels[x][y] &= 0xFFFF00;
+        this.pixels[x][y] += value;
+    }
+    
+    protected void setColor (int x, int y, int channel, int value) {
+        if (channel == 0)
+            this.setRed(x, y, value);
+        else if (channel == 1)
+            this.setGreen(x, y, value);
+        else
+            this.setBlue(x, y, value);
     }
     
     // V1

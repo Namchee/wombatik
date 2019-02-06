@@ -19,10 +19,10 @@ public class ImageEncoder extends ImageProcessor {
     }
 
     private void embedSecretData(int x, int y, int channel, int pos) {
-        int clean = this.pixels[x][y][channel] & 0xFC; // 253
+        int clean = this.getColor(x, y, channel) & 0xFC; // 253
         int secret = (this.msg.charAt(pos) & this.mask) >> this.shift;
         clean += secret;
-        this.pixels[x][y][channel] = clean;
+        this.setColor(x, y, channel, clean);
         this.mask >>= 2;
         this.shift -= 2;
         if (this.mask == 0) {
@@ -32,73 +32,67 @@ public class ImageEncoder extends ImageProcessor {
     }
 
     private void setLength(int x, int y, int channel, int shift) {
-        int clean = this.pixels[x][y][channel] & 0xFE; // 254
+        System.out.println(x + " " + y);
+        int clean = this.getColor(x, y, channel) & 0xFE; // 254
         int secret = (this.msg.length() >> shift) & 1;
-        this.pixels[x][y][channel] = clean + ((this.msg.length() == 0x10000) ? 0 : secret); // 65.536
+        clean += ((this.msg.length() == 0x10000) ? 0 : secret); // 65.536
+        this.setColor(x, y, channel, clean);
     }
 
     private BufferedImage createResult() {
         BufferedImage res = new BufferedImage(this.pixels.length, this.pixels[0].length, BufferedImage.TYPE_INT_RGB);
         for (int i = 0; i < this.pixels.length; i++) {
             for (int j = 0; j < this.pixels[i].length; j++) {
-                res.setRGB(i, j, new Color(this.pixels[i][j][0], this.pixels[i][j][1], this.pixels[i][j][2]).getRGB());
+                res.setRGB(i, j, new Color(this.getRed(i, j), this.getGreen(i, j), this.getBlue(i, j)).getRGB());
             }
         }
         return res;
     }
 
-    private void embedBitLengthIndicator(int x, int y) {
-        this.pixels[x][y][0] &= 0xFD; // 253
+    private void embedBitLengthIndicator (int x, int y) {
         if (this.msg.length() > 0xFF)
-            this.pixels[x][y][0] += 0x2;
+            this.setRed(x, y, (this.getRed(x, y) & 0xFD) + 2);
+        else
+            this.setRed(x, y, (this.getRed(x, y) & 0xFD));
     }
 
-    private void embedBitStartIndication(int start, int layer, boolean clockwise) {
-        this.pixels[layer][layer][0] &= 0xFB; // 251
-        this.pixels[layer][this.pixels.length - layer - 1][0] &= 0xFB;
-        this.pixels[this.pixels.length - layer - 1][this.pixels.length - layer - 1][0] &= 0xFB;
-        this.pixels[this.pixels.length - layer - 1][layer][0] &= 0xFB;
-
+    private void embedBitStartIndication (int start, int layer, boolean clockwise) {  
+        int x, y;
         if (start == 0) { // top-left
-            this.pixels[layer][layer][0] += 4;
-
-            this.pixels[layer][layer][1] &= 0xFB;
-
-            if (clockwise) {
-                this.pixels[layer][layer][1] += 4;
-            }
+            x = layer;
+            y = layer;
         } else if (start == 1) { // top-right
-            this.pixels[layer][this.pixels.length - layer - 1][0] += 4;
-
-            this.pixels[layer][this.pixels.length - layer - 1][1] &= 0xFB;
-
-            if (clockwise) {
-                this.pixels[layer][this.pixels.length - layer - 1][1] += 4;
-            }
+            x = layer;
+            y = this.pixels.length - layer - 1;
         } else if (start == 2) { // bottom-right
-            this.pixels[this.pixels.length - layer - 1][this.pixels.length - layer - 1][0] += 4;
-
-            this.pixels[this.pixels.length - layer - 1][this.pixels.length - layer - 1][1] &= 0xFB;
-
-            if (clockwise) {
-                this.pixels[this.pixels.length - layer - 1][this.pixels.length - layer - 1][1] += 4;
-            }
+            x = this.pixels.length - layer - 1;
+            y = this.pixels.length - layer - 1;
         } else { // bottom-left
-            this.pixels[this.pixels.length - layer - 1][layer][0] += 4;
-
-            this.pixels[this.pixels.length - layer - 1][layer][1] &= 0xFB;
-
-            if (clockwise) {
-                this.pixels[this.pixels.length - layer - 1][layer][1] += 4;
-            }
+            x = this.pixels.length - layer - 1;
+            y = layer;
         }
+        
+        this.setRed(layer, layer, this.getRed(layer, layer) & 0xFB); // 251
+        this.setRed(layer, this.pixels.length - layer - 1, this.getRed(layer, this.pixels.length - layer - 1) & 0xFB);
+        this.setRed(this.pixels.length - layer - 1, this.pixels.length - layer - 1, this.getRed(this.pixels.length - layer - 1, this.pixels.length - layer - 1) & 0xFB);
+        this.setRed(this.pixels.length - layer - 1, layer, this.getRed(this.pixels.length - layer - 1, layer) & 0xFB);
+        
+        this.setGreen(layer, layer, this.getGreen(layer, layer) & 0xFB); // 251
+        this.setGreen(layer, this.pixels.length - layer - 1, this.getGreen(layer, this.pixels.length - layer - 1) & 0xFB);
+        this.setGreen(this.pixels.length - layer - 1, this.pixels.length - layer - 1, this.getGreen(this.pixels.length - layer - 1, this.pixels.length - layer - 1) & 0xFB);
+        this.setGreen(this.pixels.length - layer - 1, layer, this.getGreen(this.pixels.length - layer - 1, layer) & 0xFB);
+
+        this.setRed(x, y, this.getRed(x, y) + 4);
+        
+        if (clockwise) 
+            this.setGreen(x, y, this.getGreen(x, y) + 4);
     }
 
     public BufferedImage encode() {
         int bit = (this.msg.length() > 0xFF) ? 16 : 8;
-        int indicator = Utilities.getIndicatorChannel(this.msg.length());
-        int first = Utilities.getFirstChannel(this.msg.length());
-        int second = Utilities.getSecondChannel(this.msg.length());
+        int indicator = this.getIndicatorChannel(this.msg.length());
+        int first = this.getFirstChannel(this.msg.length());
+        int second = this.getSecondChannel(this.msg.length());
         int x = 0;
         int y = 0;
         // embed secret data length
@@ -116,36 +110,36 @@ public class ImageEncoder extends ImageProcessor {
         int curChar = 0;
         for (; x < this.pixels.length && curChar < this.msg.length(); x++) {
             for (; y < this.pixels[x].length && curChar < this.msg.length(); y++) {
-                int id = this.pixels[x][y][indicator] & 0x3; // get last two bits
-                switch (id) {
-                case 0: {
-                    // do nothing
-                    break; // to prevent unwanted bugs!
-                }
-                case 1: {
-                    // embed to second channel
-                    this.embedSecretData(x, y, second, curChar);
-                    break;
-                }
-                case 2: {
-                    // embed to first channel
-                    this.embedSecretData(x, y, first, curChar);
-                    break;
-                }
-                case 3: {
-                    // embed to first channel
-                    this.embedSecretData(x, y, first, curChar);
-                    if (this.mask == 0xC0)
-                        curChar++;
+                int id = this.getColor(x, y, indicator) & 0x03; // get last two bits
+                
+                if (id > 0) {
+                    switch (id) {
+                        case 1: {
+                            // embed to second channel
+                            this.embedSecretData(x, y, second, curChar);
+                            break;
+                        }
+                        case 2: {
+                            // embed to first channel
+                            this.embedSecretData(x, y, first, curChar);
+                            break;
+                        }
+                        case 3: {
+                            // embed to first channel
+                            this.embedSecretData(x, y, first, curChar);
+                            if (this.mask == 0xC0)
+                                curChar++;
 
-                    if (curChar < this.msg.length()) // embed to second channel
-                        this.embedSecretData(x, y, second, curChar);
+                            if (curChar < this.msg.length()) // embed to second channel
+                                this.embedSecretData(x, y, second, curChar);
 
-                    break;
+                            break;
+                        }
                 }
-                }
+                    
                 if (this.mask == 0xC0)
                     curChar++;
+                }
             }
         }
         // create the encoded image
@@ -187,7 +181,7 @@ public class ImageEncoder extends ImageProcessor {
     
     private int embedData (int x, int y, int c_idx, int char_pos) {
         int embedded = 0;
-        int id = this.pixels[x][y][this.indicator_channel[c_idx]] & 0x03;
+        int id = this.getColor(x, y, this.indicator_channel[c_idx]) & 0x03;
         
         if (id > 0) {
             switch (id) {
@@ -242,7 +236,9 @@ public class ImageEncoder extends ImageProcessor {
 
             // embed how many bits to read for length when decoding
             if (!mark_bit) {
+                // System.out.println(Integer.toBinaryString(this.getRed(x, y)));
                 this.embedBitLengthIndicator(x, y);
+                // System.out.println(Integer.toBinaryString(this.getRed(x, y)));
                 mark_bit = true;
             }
 

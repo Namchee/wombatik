@@ -14,14 +14,14 @@ public class ImageDecoder extends ImageProcessor {
 	}
 	
 	public boolean decode (String verification, String algorithm) {
-	    int bit = (this.pixels[0][0][0] & 0x2) > 0 ? 16 : 8;
+	    int bit = (this.getRed(0, 0) & 0x2) > 0 ? 16 : 8;
 		String res = "";
 		int x = 0;
 		int y = 0;
 		int len = 0;
 		// first, let's get the length of secret data
 		for (int i = 0; i < bit; i++) {
-			len = (len << 1) + (this.pixels[x][y][i % 3] & 1);
+			len = (len << 1) + (this.getColor(x, y, i % 3) & 1);
 			y++;
 			if (y >= this.pixels[0].length) {
 				y = 0;
@@ -31,13 +31,13 @@ public class ImageDecoder extends ImageProcessor {
 		if (len == 0) 
 		    len = 0x10000;
 		
-		int indicator = Utilities.getIndicatorChannel(len);
-		int first = Utilities.getFirstChannel(len);
-		int second = Utilities.getSecondChannel(len);
+		int indicator = this.getIndicatorChannel(len);
+		int first = this.getFirstChannel(len);
+		int second = this.getSecondChannel(len);
 		// now, retrieve the actual message
 		for (; x < this.pixels.length && res.length() < len; x++) {
 			for (; y < this.pixels[x].length && res.length() < len; y++) {
-				int id = this.pixels[x][y][indicator] & 3;
+				int id = this.getColor(x, y, indicator) & 0x03;
 				switch (id) {
 					case 0 : {
 						// nothing hidden
@@ -76,7 +76,7 @@ public class ImageDecoder extends ImageProcessor {
 	
 	private void extractBits (int x, int y, int channel) {
 	    // System.out.printf("src : %d\n", this.pixels[x][y][channel]);
-		this.code = (this.code << 2) + (this.pixels[x][y][channel] & 0x03);
+		this.code = (this.code << 2) + (this.getColor(x, y, channel) & 0x03);
 		this.bit += 2;
 	}
 	
@@ -91,9 +91,9 @@ public class ImageDecoder extends ImageProcessor {
 	    int x, y, idx, increment = 1;
 	    int[] res = new int[4];
 	    
-	    int top = this.pixels[layer][layer][0] & 0x04;
-        int right = this.pixels[layer][this.pixels.length - layer - 1][0] & 0x04;
-        int bottom = this.pixels[this.pixels.length - layer - 1][this.pixels.length - layer - 1][0] & 0x04;
+	    int top = this.getRed(layer, layer) & 0x04;
+        int right = this.getRed(layer, this.pixels.length - layer - 1) & 0x04;
+        int bottom = this.getRed(this.pixels.length - layer - 1, this.pixels.length - layer - 1) & 0x04;
         
         if (top > 0) {
             x = layer;
@@ -113,7 +113,7 @@ public class ImageDecoder extends ImageProcessor {
             idx = 3;
         }
         
-        if ((this.pixels[x][y][1] & 0x04) == 0) {
+        if ((this.getGreen(x, y) & 0x04) == 0) {
             increment = 1;
             idx++;
             if (idx >= 4)
@@ -145,10 +145,11 @@ public class ImageDecoder extends ImageProcessor {
         start_x = x;
         start_y = y;
         
-        int pick_bit = (this.pixels[x][y][0] & 0x02) > 0 ? 16 : 8;
+        int pick_bit = (this.getRed(x, y) & 0x02) > 0 ? 16 : 8;
 	    
 	    for (int i = 0; i < pick_bit; i++) {
-	        len = (len << 1) + (this.pixels[x][y][i % 3] & 1);
+	        // System.out.println(x + " " + y);
+	        len = (len << 1) + (this.getColor(x, y, i % 3) & 1);
 	        
 	        x += this.DIRECTION_X[idx];
 	        y += this.DIRECTION_Y[idx];
@@ -193,7 +194,7 @@ public class ImageDecoder extends ImageProcessor {
 	        // System.out.printf("Bit pos: %d %d\n", x, y);
 	        // System.out.println("START");
 	        
-	        int id = this.pixels[x][y][this.indicator_channel[c_idx]] & 0x3;
+	        int id = this.getColor(x, y, this.indicator_channel[c_idx]) & 0x03;
 	        
 	        switch (id) {
 	            case 0: {
